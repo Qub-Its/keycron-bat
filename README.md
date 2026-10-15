@@ -19,6 +19,18 @@ The Keychron K3 connects over **Bluetooth Classic** (HID, not BLE), so it has no
 - Report an Issue… menu item (opens a prefilled GitHub issue)
 - No Dock icon, no dependencies
 
+## Download
+
+Grab the latest `KeycronBat-<version>.zip` from [Releases](https://github.com/Qub-Its/keycron-bat/releases/latest) (universal: Apple Silicon + Intel).
+
+```bash
+unzip KeycronBat-*.zip && mv KeycronBat.app /Applications/
+xattr -dr com.apple.quarantine /Applications/KeycronBat.app   # app is not notarized
+open /Applications/KeycronBat.app
+```
+
+Then grant Input Monitoring (see below). Release builds are ad-hoc signed, so after installing a new version you may need to re-grant it (`tccutil reset ListenEvent dev.qubits.keycronbat`).
+
 ## Requirements
 
 - macOS 14 Sonoma or later
@@ -60,6 +72,7 @@ Layout:
 | `Sources/KeycronBat/` | SwiftUI `MenuBarExtra` app |
 | `Resources/Info.plist` | Bundle metadata (`LSUIElement`) |
 | `scripts/build-app.sh` | Release build → `.app` bundle |
+| `scripts/package-release.sh` | Universal, stripped, ad-hoc signed `.zip` + `.sha256` for GitHub Releases |
 | `docs/superpowers/` | Design spec and implementation plan |
 
 ## Compatibility
