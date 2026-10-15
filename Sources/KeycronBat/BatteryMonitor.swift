@@ -15,14 +15,21 @@ final class BatteryMonitor: ObservableObject {
     private let notifier = LowBatteryNotifier()
     private var policy = LowBatteryPolicy()
     private var timer: Timer?
+    private var pendingRefresh: Task<Void, Never>?
 
     init() {
         notifier.requestAuthorization()
         reader.onDevicesChanged = { [weak self] in
             // Give a freshly connected Bluetooth link a moment before querying it.
+            // Debounced: a burst of events yields a single refresh.
             Task { @MainActor in
-                try? await Task.sleep(for: .seconds(2))
-                self?.refresh()
+                guard let self else { return }
+                self.pendingRefresh?.cancel()
+                self.pendingRefresh = Task { @MainActor [weak self] in
+                    try? await Task.sleep(for: .seconds(2))
+                    guard !Task.isCancelled else { return }
+                    self?.refresh()
+                }
             }
         }
         timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in

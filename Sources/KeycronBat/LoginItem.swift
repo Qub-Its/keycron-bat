@@ -3,7 +3,7 @@ import ServiceManagement
 
 @MainActor
 final class LoginItem: ObservableObject {
-    @Published private(set) var isEnabled = SMAppService.mainApp.status == .enabled
+    @Published private(set) var isEnabled = Bundle.main.bundleIdentifier != nil && SMAppService.mainApp.status == .enabled
 
     /// SMAppService needs a real .app bundle.
     var isAvailable: Bool { Bundle.main.bundleIdentifier != nil }

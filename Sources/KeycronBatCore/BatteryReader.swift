@@ -40,6 +40,7 @@ public final class BatteryReader {
             return .noDevice
         }
         var sawPermissionError = false
+        var sawReadFailure = false
         for device in devices {
             let openStatus = IOHIDDeviceOpen(device, Self.options)
             if openStatus == IOReturnCode.notPermitted {
@@ -54,9 +55,15 @@ public final class BatteryReader {
             var buffer = [UInt8](repeating: 0, count: 8)
             var length = CFIndex(buffer.count)
             let status = IOHIDDeviceGetReport(device, kIOHIDReportTypeInput, CFIndex(reportID), &buffer, &length)
-            return ReadResult.fromReport(status, bytes: Array(buffer.prefix(length)), reportID: UInt8(truncatingIfNeeded: reportID))
+            let result = ReadResult.fromReport(status, bytes: Array(buffer.prefix(max(0, length))), reportID: UInt8(truncatingIfNeeded: reportID))
+            switch result {
+            case .level: return result
+            case .notPermitted: sawPermissionError = true
+            default: sawReadFailure = true
+            }
         }
-        return sawPermissionError ? .notPermitted : .noDevice
+        if sawPermissionError { return .notPermitted }
+        return sawReadFailure ? .failed : .noDevice
     }
 
     private func batteryReportID(of device: IOHIDDevice) -> UInt32? {
