@@ -17,8 +17,9 @@ show this natively for the K3.
 - HID report descriptor declares Usage Page `0x06` (Generic Device Controls),
   Usage `0x20` (Battery Strength), Input, Report ID 3, 8 bits, 0–100.
 - `IOHIDDeviceGetReport(device, kIOHIDReportTypeInput, 3, buf, &len)` returns
-  `[0x03, level]`. Observed value 36, user confirmed plausible. Buffer must be
-  2 bytes; a larger buffer returns trailing junk (the BT address).
+  `[0x03, level]`. Observed value 36, user confirmed plausible. With an 8-byte
+  buffer the call reports length 8 with trailing junk (the BT address), so
+  only bytes 0–1 are parsed.
 - Report ID `0xFF` (Apple-style battery usages 0x24–0x26) returns
   `0xe00002c7` — not used.
 - `IOHIDDeviceOpen` on a keyboard requires the **Input Monitoring** privacy
@@ -67,8 +68,8 @@ Swift Package (SwiftPM), macOS 14+, SwiftUI `MenuBarExtra`. Two targets:
 - `func read() -> ReadResult` where
   `enum ReadResult { case level(Int), noDevice, notPermitted, failed }`.
 - `read()` picks the first device with a `0x06/0x20` input element, opens it,
-  calls `IOHIDDeviceGetReport` with that element's report ID and a 2-byte
-  buffer, passes bytes to `BatteryReport.parse`.
+  calls `IOHIDDeviceGetReport` with that element's report ID and an 8-byte
+  buffer (the verified size), passes bytes to `BatteryReport.parse`.
 - `kIOReturnNotPermitted` from open/get → `.notPermitted`.
 
 **`LowBatteryPolicy` (Core)** — pure threshold/hysteresis state.
