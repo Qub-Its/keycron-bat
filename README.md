@@ -16,6 +16,7 @@ The Keychron K3 connects over **Bluetooth Classic** (HID, not BLE), so it has no
 - Refreshes every 5 minutes, on connect/disconnect, and on demand
 - Notification when battery drops below 20% (once per discharge; re-arms at 25%)
 - Open at Login toggle
+- Report an Issue… menu item (opens a prefilled GitHub issue)
 - No Dock icon, no dependencies
 
 ## Requirements

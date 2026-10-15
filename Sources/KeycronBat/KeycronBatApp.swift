@@ -1,4 +1,5 @@
 import AppKit
+import KeycronBatCore
 import SwiftUI
 
 @main
@@ -53,9 +54,24 @@ struct MenuContent: View {
                 set: { loginItem.setEnabled($0) }
             ))
         }
+        Button("Report an Issue…") {
+            NSWorkspace.shared.open(FeedbackLink.url(
+                appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev",
+                osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
+                status: feedbackStatus
+            ))
+        }
         Divider()
         Button("Quit") { NSApplication.shared.terminate(nil) }
             .keyboardShortcut("q")
+    }
+
+    private var feedbackStatus: String {
+        switch monitor.state {
+        case .level(let level): "\(level)%"
+        case .disconnected: "disconnected"
+        case .needsPermission: "needs permission"
+        }
     }
 
     private var statusLine: String {
