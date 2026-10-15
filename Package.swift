@@ -6,6 +6,7 @@ let package = Package(
     platforms: [.macOS(.v14)],
     targets: [
         .target(name: "KeycronBatCore"),
+        .executableTarget(name: "KeycronBat", dependencies: ["KeycronBatCore"]),
         .testTarget(name: "KeycronBatCoreTests", dependencies: ["KeycronBatCore"]),
     ]
 )
