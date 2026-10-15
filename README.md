@@ -28,14 +28,22 @@ The Keychron K3 connects over **Bluetooth Classic** (HID, not BLE), so it has no
 ## Build & install
 
 ```bash
-scripts/build-app.sh            # builds build/KeycronBat.app (ad-hoc signed)
+scripts/build-app.sh            # builds build/KeycronBat.app
 cp -R build/KeycronBat.app /Applications/
 open /Applications/KeycronBat.app
 ```
 
 On first launch the menu shows **Grant Input Monitoring…** — enable *KeycronBat* in System Settings → Privacy & Security → Input Monitoring, then quit and reopen the app.
 
-> Because the app is ad-hoc signed, rebuilding it may require granting Input Monitoring again.
+### Code signing
+
+macOS ties the Input Monitoring grant to the app's signature. The build script signs with, in order:
+
+1. `SIGN_IDENTITY` if set (e.g. `SIGN_IDENTITY="Developer ID Application: …" scripts/build-app.sh`)
+2. the first **Apple Development** certificate in your keychain (free with any Apple ID via Xcode → Settings → Accounts)
+3. ad-hoc (`-`) as a fallback
+
+With a certificate, the permission survives rebuilds. With ad-hoc signing every build looks like a new app: if the menu shows `!` even though KeycronBat is enabled in Input Monitoring, run `tccutil reset ListenEvent dev.qubits.keycronbat` and grant it again.
 
 ## Development
 
